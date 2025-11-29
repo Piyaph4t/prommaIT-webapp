@@ -1,3 +1,4 @@
+#!venv/bin/python3.14
 from app import create_app
 
 app = create_app()
