@@ -21,13 +21,7 @@ INSTALL="sudo $PACKAGE_MANAGER install -y"
 $INSTALL python3 python3-venv python3-pip
 
 
-echo "🐍 Setting up Python Virtual Environment..."
-if command -v python3 &> /dev/null; then
-    python3 -m venv venv
-    echo "✅ Virtual environment created."
-else
-
-fi
+echo "✅ Virtual environment created."
 
 source venv/bin/activate
 pip install -r requirements.txt
