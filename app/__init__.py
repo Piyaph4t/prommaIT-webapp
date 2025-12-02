@@ -1,43 +1,41 @@
 from flask import Flask
-from config import Config
 from app.extensions import db, login_manager, admin
-from app.models import User, Student, Award
-from flask_admin.contrib.sqla import ModelView
-from flask_login import current_user
+from config import Config
 
-class SecureModelView(ModelView):
-    def is_accessible(self):
-        # In a real app, strict this to: return current_user.is_authenticated
-        # For setup testing, we allow it, but recommend enabling auth later
-        return True 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    # Initialize Extensions
     db.init_app(app)
     login_manager.init_app(app)
+
+    # Initialize Admin
     admin.init_app(app)
 
-    # Add Admin Views
-    admin.add_view(SecureModelView(User, db.session))
-    admin.add_view(SecureModelView(Student, db.session))
-    admin.add_view(SecureModelView(Award, db.session))
-
+    # Register Blueprints
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
-    # Create DB and Admin User
-    with app.app_context():
-        db.create_all()
-        if not User.query.filter_by(username='admin').first():
-            print("Creating default admin user...")
-            u = User(username='admin')
-            u.set_password('admin123')
-            db.session.add(u)
-            db.session.commit()
+    # Import Models and Views for Admin
+    from app.models import User, Student, Contact, Award
+    from app.admin_views import SecureModelView, StudentView
+
+    # Add Views to Admin
+    # Use StudentView for Student (to get image upload)
+    admin.add_view(StudentView(Student, db.session))
+    # Use SecureModelView for others (just to protect them)
+    admin.add_view(SecureModelView(User, db.session))
+    admin.add_view(SecureModelView(Contact, db.session))
+    admin.add_view(SecureModelView(Award, db.session))
 
     return app
+
+
+# User Loader for Flask-Login
+from app.models import User
+
 
 @login_manager.user_loader
 def load_user(user_id):

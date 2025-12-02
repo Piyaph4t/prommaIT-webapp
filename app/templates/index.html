@@ -24,13 +24,16 @@
 </style>
 </head>
 <body>
-<header>
+
  <div class="logo-text">PROMMA</div>
-</header>
+ <div class="logo-text">
+     <a href="{{ url_for('main.login') }}">login</a>
+ </div>
+
 <div class="container">
   {% for student in students %}
   <div class="card">
-    <img src="{{ student.image_url }}" alt="{{ student.name }}" />
+    <img src="{{ url_for('static', filename='images/' + student.image_url) }}" alt="{{ student.name }}" />
     <div class="card-title">{{ student.name }}</div>
     <div class="card-content">
       <b>รางวัล:</b>
@@ -38,9 +41,16 @@
         {% for award in student.awards %}
             <li>{{ award.description }}</li>
         {% else %}
-            <li>ไม่มีรางวัล</li>
+            <li>Empty</li>
         {% endfor %}
       </ol>
+        <b>Contact :</b>
+        <div>
+            <b>Gmail</b> : {{ student.school_gmail }}
+            {% for contact in student.contacts.all() %}
+                <b>{{ contact.platform }}</b> : {{ contact.address }}
+            {% endfor %}
+        </div>
     </div>
   </div>
   {% else %}
