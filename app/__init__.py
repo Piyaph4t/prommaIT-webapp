@@ -19,7 +19,7 @@ def create_app(config_class=Config):
     app.register_blueprint(main_bp)
 
     # Import Models and Views for Admin
-    from app.models import User, Student, Contact, Award
+    from app.models import User, Student,  Award
     from app.admin_views import SecureModelView, StudentView
 
     # Add Views to Admin
@@ -27,7 +27,6 @@ def create_app(config_class=Config):
     admin.add_view(StudentView(Student, db.session))
     # Use SecureModelView for others (just to protect them)
     admin.add_view(SecureModelView(User, db.session))
-    admin.add_view(SecureModelView(Contact, db.session))
     admin.add_view(SecureModelView(Award, db.session))
 
     return app
