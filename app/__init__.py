@@ -2,40 +2,40 @@ from flask import Flask
 from app.extensions import db, login_manager, admin
 from config import Config
 
+__FLASK_APP__ = Flask(__name__)
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
-    app.config.from_object(config_class)
+    global __FLASK_APP__
+    __FLASK_APP__.config.from_object(config_class)
 
     # Initialize Extensions
-    db.init_app(app)
-    login_manager.init_app(app)
+    db.init_app(__FLASK_APP__)
+    login_manager.init_app(__FLASK_APP__)
 
     # Initialize Admin
-    admin.init_app(app)
+    admin.init_app(__FLASK_APP__)
 
-    # Register Blueprints
-    from app.main import bp as main_bp
-    app.register_blueprint(main_bp)
 
     # Import Models and Views for Admin
-    from app.models import User, Student,  Award
+    from app.models import User, Student
     from app.admin_views import SecureModelView, StudentView
 
     # Add Views to Admin
     # Use StudentView for Student (to get image upload)
     admin.add_view(StudentView(Student, db.session))
-    # Use SecureModelView for others (just to protect them)
     admin.add_view(SecureModelView(User, db.session))
-    admin.add_view(SecureModelView(Award, db.session))
-
-    return app
+    return __FLASK_APP__
 
 
 # User Loader for Flask-Login
-from app.models import User
+from .models import User
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+
+# Route URL
+from app import routes

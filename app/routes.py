@@ -1,16 +1,13 @@
 from flask import render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required
 from app.models import User, Student
-from app.main import bp
-
-
-@bp.route('/')
+from app import __FLASK_APP__
+@__FLASK_APP__.route('/')
 def index():
     students = Student.query.all()
     return render_template('index.html', students=students)
 
-
-@bp.route('/login', methods=['GET', 'POST'])
+@__FLASK_APP__.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -27,10 +24,3 @@ def login():
             flash('Invalid username or password')
 
     return render_template('login.html')
-
-
-@bp.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('main.index'))
